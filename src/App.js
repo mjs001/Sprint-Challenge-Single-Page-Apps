@@ -1,27 +1,67 @@
 import React, { useState, useEffect } from "react";
-import Header from "./components/Header.js";
-import axios from "axios";
-import CharCard from "./components/CharacterCard";
-import Navigation from "./components/LocationsList";
+import { Route } from "react-router-dom";
+import Axios from "axios";
+import Header from "./components/Header";
+import WelcomePage from "./components/WelcomePage";
+import CharacterList from "./components/CharacterList";
+import Nav from "./components/Nav";
+import styled from "styled-components";
+
+const StyledContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const rickMortyApi = "https://rickandmortyapi.com/api/character/";
+
 export default function App() {
-  const [CharacterData, setCharacterData] = useState([]);
+  const [characterData, setCharacterData] = useState();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const onSearch = event => {
+    setSearchTerm(event.target.value);
+  };
+
   useEffect(() => {
-    axios
-      .get(`https://rickandmortyapi.com/api/character/`)
+    Axios.get(rickMortyApi)
       .then(response => {
-        setCharacterData(response.data);
-        console.log(response.data);
+        console.log(response);
+        setCharacterData(response.data.results);
       })
       .catch(error => {
-        console.log("error", error);
+        console.log("Server Error", error);
       });
   }, []);
 
+  if (characterData) {
+    return (
+      <main>
+        <Nav />
+        <Header />
+        <StyledContainer>
+          <Route exact path="/" component={WelcomePage} />
+          <Route
+            exact
+            path="/characters"
+            render={() => (
+              <CharacterList
+                onSearch={onSearch}
+                characterList={characterData.filter(char => {
+                  return char.name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase());
+                })}
+              />
+            )}
+          />
+        </StyledContainer>
+      </main>
+    );
+  }
   return (
-    <main>
-      <Header />
-      <CharCard charInfo={CharacterData.results} />
-      <Navigation />;
-    </main>
+    <div>
+      <h4>Please wait while we shwiftily load your web page...</h4>
+    </div>
   );
 }
