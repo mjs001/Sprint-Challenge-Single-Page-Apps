@@ -10,7 +10,7 @@ const StyledCard = styled.div`
   max-width: 350px;
   margin: 20px;
   padding: 10px;
-  border-radius: 15px;
+  border-radius: 20px;
   &&:hover {
     box-shadow: 10px 5px 40px -1px rgba(87, 81, 87, 0.65);
   }
